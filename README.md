@@ -1,5 +1,17 @@
 # Orthogonalised Optimisers
 
+### Anonymised Repo
+If you're looking at the anonymised repo then you can't clone/download it.
+However, you can just download the relevant files individually:
+
+```bash
+mkdir -p Orthogonal-Optimiser
+cd Orthogonal-Optmiser
+mkdir src/orth_optim
+wget https://anonymous.4open.science/api/repo/Orthogonal-Optimisers/file/setup.py
+wget https://anonymous.4open.science/api/repo/Orthogonal-Optimisers/file/src/orth_optim/__init__.py -O src/orth_optim/__init__.py
+```
+
 ## Install  package
 ```bash
 git clone https://github.com/MarkTuddenham/Orthogonal-Optimiser.git
