@@ -2,6 +2,8 @@
 
 ## Install  package
 ```bash
+git clone https://github.com/MarkTuddenham/Orthogonal-Optimiser.git
+cd Orthogonal-Optimiser
 pip install .
 ```
 or 
@@ -17,7 +19,7 @@ And then at the top of your main python script:
 from orth_optim import hook
 hook()
 ```
-Now SGD has an orthogonal option
+Now the torch optimisers have an orthogonal option, e.g:
 ```python
 torch.optim.SGD(model.parameters(),
                 lr=1e-3,
