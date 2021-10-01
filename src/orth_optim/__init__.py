@@ -6,7 +6,7 @@ import logging
 
 import torch
 
-OptimType = TypeVar('U', bound=torch.optim.Optimizer)
+OptimType = TypeVar('OptimType', bound=torch.optim.Optimizer)
 
 logger: logging.Logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -31,7 +31,7 @@ def _orth_grads(optimiser: OptimType) -> None:
                             G,
                             q=1,    # assume rank is at least 1
                             M=1e-4 * G.mean() * torch.randn_like(G))
-                        orth_G: torch.Tensor = u @ v.T
+                        orth_G = u @ v.T
                     except RuntimeError:
                         logger.error(('Failed to perform SVD with noise,'
                                       ' skipping gradient orthogonalisation'))
