@@ -5,7 +5,7 @@ If you're looking at the anonymised repo then you can't clone/download it.
 However, you can just download the relevant files individually:
 
 ```bash
-mkdir -p Orthogonal-Optimiser
+mkdir -p Orthogonal-Optimisers
 cd Orthogonal-Optmiser
 mkdir src/orth_optim
 wget https://anonymous.4open.science/api/repo/Orthogonal-Optimisers/file/setup.py
@@ -14,14 +14,14 @@ wget https://anonymous.4open.science/api/repo/Orthogonal-Optimisers/file/src/ort
 
 ## Install  package
 ```bash
-git clone https://github.com/MarkTuddenham/Orthogonal-Optimiser.git
-cd Orthogonal-Optimiser
+git clone https://github.com/MarkTuddenham/Orthogonal-Optimisers.git
+cd Orthogonal-Optimisers
 pip install .
 ```
 or 
 
 ```bash
-pip install git+https://github.com/MarkTuddenham/Orthogonal-Optimiser.git#egg=orth_optim
+pip install git+https://github.com/MarkTuddenham/Orthogonal-Optimisers.git#egg=orth_optim
 ```
 
 ## Usage
