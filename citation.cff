@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: Tuddenham
+  given-names: Mark
+  affiliation: University of Southampton
+  email: mark.tuddenham@southampton.ac.uk
+  orcid: "https://orcid.org/0000-0002-3428-4051"
+- family-names: Prügel-Bennett
+  given-names: Adam
+- family-names: Hare
+  given-names: Jonathan
+title: "Orthogonalising gradients to speed up neural network optimisation"
+version: 1.0.0
+date-released: 2022-02-14
+url: "https://github.com/MarkTuddenham/Orthogonal-Optimisers"
