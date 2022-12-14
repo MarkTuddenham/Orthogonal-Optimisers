@@ -13,6 +13,12 @@ logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.NullHandler())
 
 
+def svb(s, eps=1e-3):
+    one_eps = 1 + eps
+    s.clamp_(min=1 / one_eps, max=one_eps)
+    return s
+
+
 def _norm_p(p):
     """Normalise parameter's gradients --- Normalised SGD."""
     p.grad.div_(p.grad.norm())
@@ -27,32 +33,57 @@ def _comp_norm_p(p):
 
 def _orth_p(p):
     """Orthogonalise components's gradients."""
-    G: torch.Tensor = p.grad.flatten(start_dim=1)
+    g: torch.tensor = p.grad.flatten(start_dim=1)
     try:
-        u, s, vt = torch.linalg.svd(G, full_matrices=False)
+        u, _, vt = torch.linalg.svd(g, full_matrices=False)
         # s = torch.where(s > 1e-3, s, 0.)
-        # orth_G: torch.Tensor = u @ torch.diag(s) @ vt
-        orth_G: torch.Tensor = u @ vt
+        # orth_g: torch.tensor = u @ torch.diag(s) @ vt
+        # orth_g: torch.tensor = u @ torch.diag(svb(s)) @ vt
+        orth_g: torch.tensor = u @ vt
     except RuntimeError:
-        logger.error('Failed to perform SVD, adding some noise.')
+        logger.error('failed to perform svd, adding some noise.')
         try:
-            u, s, v = torch.svd_lowrank(
-                G,
+            u, _, v = torch.svd_lowrank(
+                g,
                 q=1,    # assume rank is at least 1
-                M=1e-4 * G.mean() * torch.randn_like(G))
-            orth_G = u @ v.T
+                m=1e-4 * g.mean() * torch.randn_like(g))
+            # orth_g = u @ torch.diag(svb(s)) @ v.t
+            orth_g = u @ v.t
         except RuntimeError:
-            logger.error(('Failed to perform SVD with noise,'
+            logger.error(('failed to perform svd with noise,'
                           ' skipping gradient orthogonalisation'))
             return
-    p.grad = orth_G.reshape_as(p)
+    p.grad = orth_g.reshape_as(p)
+
+
+def _svb_weight(p):
+    """Orthogonalise components's gradients."""
+    g: torch.tensor = p.flatten(start_dim=1)
+    try:
+        u, _, vt = torch.linalg.svd(g, full_matrices=False)
+        # s = torch.where(s > 1e-3, s, 0.)
+        # orth_g: torch.tensor = u @ torch.diag(s) @ vt
+        orth_g: torch.tensor = u @ torch.diag(svb(s)) @ vt
+    except RuntimeError:
+        logger.error('failed to perform svd, adding some noise.')
+        try:
+            u, s, v = torch.svd_lowrank(
+                g,
+                q=1,    # assume rank is at least 1
+                m=1e-4 * g.mean() * torch.randn_like(g))
+            orth_g = u @ torch.diag(svb(s)) @ v.t
+        except RuntimeError:
+            logger.error(('failed to perform svd with noise,'
+                          ' skipping gradient orthogonalisation'))
+            return
+    p = orth_g.reshape_as(p)
 
 
 @torch.no_grad()
 def _orth_grads(optimiser: OptimType) -> None:
     """Apply the specified transform to all the parameters."""
     for group in optimiser.param_groups:
-        for i, p in enumerate(group['params']):
+        for p in group['params']:
             if p.grad is not None and p.ndim > 1:
                 if group['orth']:
                     _orth_p(p)
@@ -60,6 +91,16 @@ def _orth_grads(optimiser: OptimType) -> None:
                     _norm_p(p)
                 elif group['norm'] == 'comp_norm':
                     _comp_norm_p(p)
+
+
+@torch.no_grad()
+def apply_svb(optimiser: OptimType) -> None:
+    """Apply the specified transform to all the parameters."""
+    for group in optimiser.param_groups:
+        for p in group['params']:
+            if p.grad is not None and p.ndim > 1:
+                if group['orth']:
+                    _svb_weight(p)
 
 
 def orthogonalise(cls: Type[OptimType]) -> Type[OptimType]:
